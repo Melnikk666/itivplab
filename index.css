@@ -1,3 +1,4 @@
+
 @font-face {
     font-family: 'Cairo-Regular';
     src: url('fonts/Cairo-Regular.ttf') format('truetype');
@@ -131,6 +132,7 @@ h3 + p {
 }
 h3 + p + p {
     color: #636363;
+    font-size: 1.5rem;
 }
 .contact-form {
     display: flex;
@@ -1120,6 +1122,10 @@ ul li a {
 
     h3 {
         font-size: 5.2rem; /* Уменьшаем заголовки */
+    }
+    h3 + p + p {
+        color: #636363;
+        font-size: 3.5rem;
     }
 
     ul {
