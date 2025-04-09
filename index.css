@@ -132,7 +132,7 @@ h3 + p {
 }
 h3 + p + p {
     color: #636363;
-    font-size: 1.5rem;
+    font-size: 1rem;
 }
 .contact-form {
     display: flex;
@@ -225,6 +225,13 @@ h3 + p + p {
 
 .submit-button:hover {
     background: rgb(213, 213, 213);
+}
+
+.error-message {
+    color: red;
+    font-size: 1rem;
+    margin-top: -1rem;
+    margin-bottom: 1rem;
 }
 
 /* HEADER */
