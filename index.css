@@ -661,6 +661,7 @@ ul li a {
 }
 
 .project-wrapper {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
