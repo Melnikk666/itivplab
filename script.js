@@ -1,39 +1,78 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const projects = document.querySelectorAll(".project-wrapper");
-    let activeProject = null;
-    let startX = 0;
-    let currentTranslateX = 0; // Храним актуальный сдвиг для каждого элемента
-    let animationFrameId = null;
+    let draggedElement = null;  // Перетаскиваемый элемент
 
-    projects.forEach((project) => {
-        project.addEventListener("mousedown", (e) => {
-            activeProject = project;
-            startX = e.clientX; // Начальная позиция мыши
-            // Получаем текущую позицию translateX из стиля элемента
-            const transform = window.getComputedStyle(project).transform;
-            currentTranslateX = transform !== 'none' ? parseFloat(transform.split(',')[4]) : 0;
-            project.style.cursor = "grabbing";
+    // Все элементы с классом project-wrapper
+    let projectWrappers = document.querySelectorAll('.project-wrapper');
+
+    // Слушаем событие начала перетаскивания
+    projectWrappers.forEach(wrapper => {
+        wrapper.addEventListener('dragstart', function (e) {
+            draggedElement = wrapper;  // Запоминаем элемент, который перетаскиваем
+            wrapper.classList.add('dragging');  // Добавляем класс для отслеживания
+            setTimeout(function () {
+                wrapper.style.opacity = '0.5'; // Мутим элемент при перетаскивании
+            }, 0);
         });
 
-        document.addEventListener("mousemove", (e) => {
-            if (!activeProject) return;
-
-            const shiftX = e.clientX - startX; // Сдвиг мыши относительно начальной позиции
-            const newTranslateX = currentTranslateX + shiftX; // Новый сдвиг относительно начальной позиции
-
-            // Используем requestAnimationFrame для плавности
-            cancelAnimationFrame(animationFrameId);
-            animationFrameId = requestAnimationFrame(() => {
-                activeProject.style.transform = `translateX(${newTranslateX}px)`;
-            });
+        // Слушаем событие окончания перетаскивания
+        wrapper.addEventListener('dragend', function (e) {
+            setTimeout(function () {
+                wrapper.style.opacity = '1'; // Восстанавливаем прозрачность
+                wrapper.classList.remove('dragging'); // Убираем класс отслеживания
+                draggedElement = null;
+            }, 0);
         });
 
-        document.addEventListener("mouseup", () => {
-            if (activeProject) {
-                activeProject.style.cursor = "grab";
-                activeProject = null;
-            }
-            cancelAnimationFrame(animationFrameId);
-        });
+        // Добавляем возможность перетаскивания для проекта
+        wrapper.setAttribute('draggable', 'true');
     });
+
+    // Контейнер для всех элементов
+    const projectsContainer = document.querySelector('.projects-container');
+
+    // Разрешаем перетаскивание в контейнере
+    projectsContainer.addEventListener('dragover', function (e) {
+        e.preventDefault();
+    });
+
+    // Обработчик события 'drop'
+    projectsContainer.addEventListener('drop', function (e) {
+        e.preventDefault();
+        if (draggedElement) {
+            const dropTarget = e.target.closest('.project-wrapper');
+            if (dropTarget && dropTarget !== draggedElement) {
+                // Найдем текущие индексы draggedElement и dropTarget в контейнере
+                const draggedIndex = Array.from(projectWrappers).indexOf(draggedElement);
+                const dropIndex = Array.from(projectWrappers).indexOf(dropTarget);
+
+                // Сравниваем индексы и вставляем элемент в нужное место
+                if (draggedIndex < dropIndex) {
+                    projectsContainer.insertBefore(draggedElement, dropTarget.nextSibling);
+                } else {
+                    projectsContainer.insertBefore(draggedElement, dropTarget);
+                }
+
+                // Обновляем фоны и порядок элементов
+                updateProjectWrappers();
+            }
+        }
+    });
+
+    // Функция для пересчета порядка элементов в контейнере
+    function updateProjectWrappers() {
+        // После перетаскивания обновляем коллекцию projectWrappers
+        projectWrappers = document.querySelectorAll('.project-wrapper');
+        
+        // Обновляем фоновые изображения
+        projectWrappers.forEach((wrapper, index) => {
+            const project = wrapper.querySelector('.project');
+            const backgroundImage = wrapper.getAttribute('data-bg');
+            if (backgroundImage) {
+                project.style.backgroundImage = `url(${backgroundImage})`;
+            }
+        });
+    }
+
+    // Изначальная установка фонов для всех проектов
+    updateProjectWrappers();
 });
